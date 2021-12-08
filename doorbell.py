@@ -91,14 +91,4 @@ while(True):
         newCall = call.Call(account, userConfig['lock']['targetVoipUri'], lock=lockInst)
         newCall.makeCall(userConfig['lock']['targetVoipUri'], call_param)
         ep.libHandleEvents(10)
-
-        """
-        try:
-            while(call.getInfo() != pj.PJSIP_INV_STATE_DISCONNECTED):
-                pass
-
-        except Exception as e:
-            time.sleep(5)
-            pass
-        """
     ep.libHandleEvents(10)
