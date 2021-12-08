@@ -1,4 +1,4 @@
-# VOIP Doorbell built on RPi Zero with Seed ReSpeaker
+# VOIP Doorbell built on RPi Zero with Seeed ReSpeaker
 Zdrojové kódy VUT semestrálního projektu VOIP zvonku v rámcí studia na BPC-IBEP.
 
 Projekt zvonku na Rapsberry Pi Zero umožňuje využít SIP operátora ke komunikaci se zvonící osobou. Vlastník má možnost spustit předem definovaný kód při zadání správného kódu pomocí číselné volby během hovoru (DTMF kódy).
