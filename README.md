@@ -29,7 +29,7 @@ Výsledné zařízení bylo umístěno do 3D tisknutelného boxu, který je sou�
 - soubor motion.conf slouží pro konfiguraci streamu z kamery skrze software Motion (http://motion-project.github.io/)
 - soubor wpa_supplicant.conf slouží pro konfiguraci připojení k WiFi síti
 - doorbell.cfg slouží pro konfiguraci SIP účtu a číselného kódu pro spuštění relé
-
+- .asoundrc slouží pro konfiguraci ALSA zvukového systému pro správnou funkci ReSpeaker 2-Mics Pi HAT na Raspberry Pi Zero 2W (a má byt umístěn v domovském adresáři uživatele pi)
 
 
 
