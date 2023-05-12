@@ -1,12 +1,10 @@
 [Unit]
 Description=SIP zvonek deamon
 After=network-online.target
-
 [Service]
 Type=idle
 ExecStart=/usr/bin/python3 /home/pi/doorbell.py "/boot/doorbell.cfg"
 WorkingDirectory=/home/pi/
 User=pi
-
 [Install]
-WantedBy=network-online.target
+WantedBy=multi-user.target
