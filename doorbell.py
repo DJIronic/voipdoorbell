@@ -13,10 +13,9 @@ import settings
 import account
 import call
 
-BUTTON = 17
+BUTTON = 13
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(BUTTON,GPIO.IN)
-
+GPIO.setup(BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 write=sys.stdout.write
 
 configPath = sys.argv[1]
@@ -45,15 +44,24 @@ appConfig.epConfig.uaConfig.threadCnt = 0
 appConfig.epConfig.uaConfig.mainThreadOnly = True
 
 # Config
+
 appConfig.epConfig.uaConfig.maxCalls = 1
+appConfig.epConfig.medConfig.channelCount = 1  # Set the channel count to 1 (mono)
+appConfig.epConfig.medConfig.clockRate = 8000
+appConfig.epConfig.medConfig.sndClockRate = 8000  # Set the sample rate to 16000 Hz
+appConfig.epConfig.medConfig.ptime = 140  # Set the ptime to 500 ms
 ep.libInit(appConfig.epConfig)
 ep.transportCreate(appConfig.udp.type, appConfig.udp.config)
+
 
 #configure the library
 config = pj.AccountConfig()
 config.idUri = userConfig['pjsua2']['id']
 config.regConfig.registrarUri = userConfig['pjsua2']['registrarUri']
 #config.regConfig.contactParams = "sip:736370@sip.odorik.cz"
+
+
+
 
 config.presConfig.publishEnabled = True
 
@@ -81,14 +89,25 @@ account.create(config)
 ep.libStart()
 ep.libHandleEvents(10)
 
-while(True):
-    input = GPIO.input(BUTTON)
-    if not input:
-        call_param = pj.CallOpParam()
-        call_param.opt.audioCount = 1
-        call_param.opt.videoCount = 0
 
-        newCall = call.Call(account, userConfig['lock']['targetVoipUri'], lock=lockInst)
-        newCall.makeCall(userConfig['lock']['targetVoipUri'], call_param)
+# Initialize an ongoing_call variable before the loop
+ongoing_call = None
+
+while True:
+    input = GPIO.input(BUTTON)
+    if input == GPIO.HIGH:  # Button is pressed
+        # Check if there's an ongoing call
+        if ongoing_call is None or ongoing_call.isCallDisconnected():
+            print("No call detected, creating a new one to " + userConfig['lock']['targetVoipUri'])
+            call_param = pj.CallOpParam()
+            call_param.opt.audioCount = 1
+            call_param.opt.videoCount = 0
+
+            ongoing_call = call.Call(account, userConfig['lock']['targetVoipUri'], lock=lockInst)
+            ongoing_call.makeCall(userConfig['lock']['targetVoipUri'], call_param)
+        else:
+            print("There's an ongoing call, can't make a new one.")
         ep.libHandleEvents(10)
     ep.libHandleEvents(10)
+    time.sleep(0.1)  # Add a short delay to avoid excessive CPU usage
+

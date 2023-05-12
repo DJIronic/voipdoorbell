@@ -24,6 +24,8 @@ import random
 import pjsua2 as pj
 import endpoint as ep
 import lock
+import time
+
 
 # Call class
 class Call(pj.Call):
@@ -43,8 +45,12 @@ class Call(pj.Call):
         ci = self.getInfo()
         self.connected = ci.state == pj.PJSIP_INV_STATE_CONFIRMED
 
+
+
     def onCallMediaState(self, prm):
         ci = self.getInfo()
+        print("Call state:", ci.state)
+
         for mi in ci.media:
             if mi.type == pj.PJMEDIA_TYPE_AUDIO and \
               (mi.status == pj.PJSUA_CALL_MEDIA_ACTIVE or \
@@ -55,12 +61,17 @@ class Call(pj.Call):
                 ep.Endpoint.instance.audDevManager().getCaptureDevMedia().startTransmit(am)
                 am.startTransmit(ep.Endpoint.instance.audDevManager().getPlaybackDevMedia())
 
+
                 if mi.status == pj.PJSUA_CALL_MEDIA_REMOTE_HOLD and not self.onhold:
                     self.chat.addMessage(None, "'%s' sets call onhold" % (self.peerUri))
                     self.onhold = True
                 elif mi.status == pj.PJSUA_CALL_MEDIA_ACTIVE and self.onhold:
                     self.chat.addMessage(None, "'%s' sets call active" % (self.peerUri))
                     self.onhold = False
+
+
+
+
         if self.chat:
             self.chat.updateCallMediaState(self, ci)
 
@@ -85,3 +96,11 @@ class Call(pj.Call):
 
     def setLock(self, lock):
         self.lockInst = lock
+
+    # Check for call disconnection to prevent crashes when button is pressed repeatedly
+    def isCallDisconnected(self):
+        try:
+         call_info = self.getInfo()
+         return call_info.state in (pj.PJSIP_INV_STATE_DISCONNECTED, pj.PJSIP_INV_STATE_NULL)
+        except pj.Error:
+         return True
